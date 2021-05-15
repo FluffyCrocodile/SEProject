@@ -45,7 +45,7 @@ STUDENTS = {
   '4': {'name': 'Kate', 'age': 22, 'spec': 'science', 'anime': 'Mirai Nikki'},
 }
 
-api.add_resource(StudentsList, '/students/')
+api.add_resource(StudentsList, '/')
 
 if __name__ == "__main__":
   app.run(debug=True)
