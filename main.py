@@ -11,14 +11,14 @@ class StudentsList(Resource):
   def get(self):
       return STUDENTS
   def post(self):
-      parser.add_argument("name")
-      parser.add_argument("key")
+      parser.add_argument("Text")
+      parser.add_argument("Key")
       args = parser.parse_args()
       student_id = int(max(STUDENTS.keys())) + 1
       student_id = '%i' % student_id
 
-      msg = args["name"]
-      key = args["key"]
+      msg = args["Text"]
+      key = args["Key"]
 
       enc = []
       for i in range(len(msg)):
@@ -30,19 +30,15 @@ class StudentsList(Resource):
       encoded = base64.urlsafe_b64encode("".join(enc).encode()).decode()
 
       STUDENTS[student_id] = {
-          "name": encoded,
-          "Anime": args["key"]
+          "Secret": encoded,
+          "Key": args["Key"]
       }
-      nekozilla = "monkey" * 2
       return STUDENTS[student_id], 201
 
 
 
 STUDENTS = {
-  '1': {'name': 'Mark', 'age': 23, 'spec': 'math', 'anime': 'Mirai Nikki'},
-  '2': {'name': 'Jane', 'age': 20, 'spec': 'biology', 'anime': 'Mirai Nikki'},
-  '3': {'name': 'Peter', 'age': 21, 'spec': 'history', 'anime': 'Mirai Nikki'},
-  '4': {'name': 'Kate', 'age': 22, 'spec': 'science', 'anime': 'Mirai Nikki'},
+  '1': {'Text': 'Mark', 'Key': 23, 'spec': 'math', 'Secret': 'Mirai Nikki'}
 }
 
 api.add_resource(StudentsList, '/')

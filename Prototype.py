@@ -1,10 +1,17 @@
+
 import tkinter.font as font      # This lets us use different fonts.
 # Importing necessary packages
 import tkinter as tk
+from tkinter import ttk
 from PIL import ImageTk, Image
 from tkinter import *
 from pytube import YouTube
 from tkinter import messagebox, filedialog, font
+from PIL import ImageTk, Image
+from PyDictionary import PyDictionary
+from googletrans import Translator
+import requests
+import json
 
 
 # Defining Browse() to select a
@@ -124,9 +131,64 @@ def change_to_quiz():
     quiz_frame.pack(fill='both', expand=1)
     work_frame.forget()
 
+def change_to_dict():
+    """
+    This function swaps from the work
+    frame to the quiz frame.
+    :return: Nothing
+    """
+    quiz_frame.forget()
+    dict_frame.pack(fill='both', expand=1)
+
+
+#root = tk.Tk()
+#root.title('Dictionary')
+#root.geometry('600x300')
+#root['bg'] = 'white'
+#frame = Frame(root, width=200, height=300, borderwidth=1, relief=RIDGE)
+#frame.grid(sticky="W")
+
+
+def get_meaning():
+    dictionary = PyDictionary()
+    get_word = entry.get()
+    langauages = langauage.get()
+
+    if get_word == "":
+        messagebox.showerror('Dictionary', 'please write the word')
+
+    elif langauages == 'English-to-English':
+        d = dictionary.meaning(get_word)
+        output.insert('end', d['Noun'])
+
+    elif langauages == 'English-to-Hindi':
+        translator = Translator()
+        t = translator.translate(get_word, dest='hi')
+        output.insert('end', t.text)
+
 
 # Now we get to the program itself:-
 # Let's set up the window ...
+
+# API Integration --------------------------------------------------------------------
+
+# defining the api-endpoint
+API_ENDPOINT = "http://cs361translator.wl.r.appspot.com/translate"
+
+
+# data to be sent to api
+data2 = {
+        "q": "Hello and welcome to the Handy Application Bundle!",
+        "target": "ko",
+        "source": "en"
+        }
+
+# sending post request and saving response as response object
+r = requests.post(url=API_ENDPOINT, json=data2)
+response = r.json()
+
+print(response['translation'])
+
 
 root = tk.Tk()
 root.title("My Work - Swapping frames")
@@ -143,6 +205,7 @@ center_window_on_screen()
 # one will be visible at a time.
 quiz_frame = tk.Frame(root)
 work_frame = tk.Frame(root)
+dict_frame = tk.Frame(root)
 
 # Let's create the fonts that we need.
 font_large = font.Font(family='Georgia',
@@ -157,17 +220,25 @@ img_logo = tk.PhotoImage(file='youtube.png')
 lbl_logo_quiz = tk.Label(quiz_frame)
 
 # Next, comes the heading for this frame.
-lbl_heading_quiz = tk.Label(quiz_frame,
-                            text='This is the Starting Page',
-                            font=font_large)
-lbl_logo_quiz.pack(pady=20)
-lbl_heading_quiz.pack(pady=20)
+#lbl_heading_quiz = tk.Label(quiz_frame,
+#                            text='This is the Starting Page',
+#                            font=font_large)
+#lbl_logo_quiz.pack(pady=20)
+#lbl_heading_quiz.pack(pady=20)
 
 lbl_welcome_tsl = tk.Label(quiz_frame,
-                            text='안녕하십니까, 환영합니다!',
-                            font=font_large)
+                            text=response['translation'],
+                            font=font_small)
 lbl_logo_quiz.pack(pady=20)
 lbl_welcome_tsl.pack(pady=20)
+
+lbl_instruct = tk.Label(quiz_frame, text='This is a collective application featuring several useful capabilities!')
+lbl_logo_quiz.pack(pady=10)
+lbl_instruct.pack(pady=3)
+
+lbl_instruct = tk.Label(quiz_frame, text='Please click from the options below which feature you want to use.')
+lbl_logo_quiz.pack(pady=10)
+lbl_instruct.pack(pady=3)
 
 # And finally, the button to swap between the frames.
 btn_change_to_work = tk.Button(quiz_frame,
@@ -175,6 +246,12 @@ btn_change_to_work = tk.Button(quiz_frame,
                                font=font_small,
                                command=change_to_work)
 btn_change_to_work.pack(pady=20)
+
+btn_change_to_dict = tk.Button(quiz_frame,
+                               text='Go to Dictionary',
+                               font=font_small,
+                               command=change_to_dict)
+btn_change_to_dict.pack(pady=20)
 
 # The widgets needed for the work frame.
 # These are only being used in this example
@@ -224,6 +301,18 @@ lbl_heading_work = tk.Label(work_frame,
                             font=font_large)
 lbl_heading_work.pack(pady=20)
 
+lbl_step1 = tk.Label(work_frame, text='Step 1: Enter the URL of the youtube video you wish to download')
+lbl_logo_quiz.pack(pady=10)
+lbl_step1.pack(pady=3)
+
+lbl_step2 = tk.Label(work_frame, text='Step 2: Click the browse button and select the file destination for your mp4 file')
+lbl_logo_quiz.pack(pady=10)
+lbl_step2.pack(pady=3)
+
+lbl_step3 = tk.Label(work_frame, text='Step 3: Click the download button and wait a bit, and you are done!')
+lbl_logo_quiz.pack(pady=10)
+lbl_step3.pack(pady=3)
+
 # Finally, we need the button to
 # swap back to the quiz frame.
 btn_change_to_quiz = tk.Button(work_frame,
@@ -237,5 +326,39 @@ btn_change_to_quiz.pack(pady=20)
 # will only appear when the Change button
 # is clicked.
 quiz_frame.pack(fill='both', expand=1)
+
+
+#Dictionary frame components:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+word = tk.Label(dict_frame, text="Enter Word", bg="white", font=('verdana', 10, 'bold'))
+word.pack(pady = 5)
+
+a = tk.StringVar()
+langauage = ttk.Combobox(dict_frame, width=20, textvariable=a, state='readonly', font=('verdana', 10, 'bold'), )
+
+langauage['values'] = (
+    'English-to-English',
+    'English-to-Hindi',
+
+)
+
+langauage.pack(pady = 5)
+langauage.current(0)
+
+entry = Entry(dict_frame, width=50, borderwidth=2, relief=RIDGE)
+entry.pack(pady = 5)
+
+search = Button(dict_frame, text="Search", font=('verdana', 10, 'bold'), cursor="hand2", relief=RIDGE, command=get_meaning)
+search.pack(pady = 5)
+
+quit = Button(dict_frame, text="Quit", font=('verdana', 10, 'bold'), cursor="hand2", relief=RIDGE, command=quit)
+quit.pack(pady = 5)
+
+meaning = Label(dict_frame, text="Meaning", bg="white", font=('verdana', 15, 'bold'))
+meaning.pack(pady = 5)
+
+output = Text(dict_frame, height=8, width=40, borderwidth=2, relief=RIDGE)
+output.place(x=230, y=160)
 
 root.mainloop()
