@@ -35,6 +35,8 @@ def Download():
     # getting user-input Youtube Link
     Youtube_link = video_Link.get()
 
+    print (Youtube_link)
+
     # select the optimal location for
     # saving file's
     download_Folder = download_Path.get()
@@ -130,6 +132,7 @@ def change_to_quiz():
     """
     quiz_frame.pack(fill='both', expand=1)
     work_frame.forget()
+    dict_frame.forget()
 
 def change_to_dict():
     """
@@ -152,19 +155,12 @@ def change_to_dict():
 def get_meaning():
     dictionary = PyDictionary()
     get_word = entry.get()
-    langauages = langauage.get()
 
     if get_word == "":
         messagebox.showerror('Dictionary', 'please write the word')
 
-    elif langauages == 'English-to-English':
-        d = dictionary.meaning(get_word)
-        output.insert('end', d['Noun'])
-
-    elif langauages == 'English-to-Hindi':
-        translator = Translator()
-        t = translator.translate(get_word, dest='hi')
-        output.insert('end', t.text)
+    d = dictionary.meaning(get_word)
+    output.insert('end', d['Noun'])
 
 
 # Now we get to the program itself:-
@@ -244,13 +240,15 @@ lbl_instruct.pack(pady=3)
 btn_change_to_work = tk.Button(quiz_frame,
                                text='Go to Download Page',
                                font=font_small,
-                               command=change_to_work)
+                               command=change_to_work,
+                               bg="yellow")
 btn_change_to_work.pack(pady=20)
 
 btn_change_to_dict = tk.Button(quiz_frame,
                                text='Go to Dictionary',
                                font=font_small,
-                               command=change_to_dict)
+                               command=change_to_dict,
+                               bg="yellow")
 btn_change_to_dict.pack(pady=20)
 
 # The widgets needed for the work frame.
@@ -269,7 +267,7 @@ link_label.pack()
 root.linkText = Entry(work_frame,
                       width=55,
                       textvariable=video_Link)
-root.linkText.pack()
+root.linkText.pack()    # Add the Entry Text to frame
 
 destination_label = Label(work_frame,
                           text="Destination    :",
@@ -318,7 +316,8 @@ lbl_step3.pack(pady=3)
 btn_change_to_quiz = tk.Button(work_frame,
                                font=font_small,
                                text='Back to main menu',
-                               command=change_to_quiz)
+                               command=change_to_quiz,
+                               bg="#05E8E0")
 btn_change_to_quiz.pack(pady=20)
 
 # Only the quiz frame needs to be shown
@@ -335,30 +334,28 @@ word = tk.Label(dict_frame, text="Enter Word", bg="white", font=('verdana', 10, 
 word.pack(pady = 5)
 
 a = tk.StringVar()
-langauage = ttk.Combobox(dict_frame, width=20, textvariable=a, state='readonly', font=('verdana', 10, 'bold'), )
 
-langauage['values'] = (
-    'English-to-English',
-    'English-to-Hindi',
-
-)
-
-langauage.pack(pady = 5)
-langauage.current(0)
 
 entry = Entry(dict_frame, width=50, borderwidth=2, relief=RIDGE)
 entry.pack(pady = 5)
 
-search = Button(dict_frame, text="Search", font=('verdana', 10, 'bold'), cursor="hand2", relief=RIDGE, command=get_meaning)
+search = Button(dict_frame, text="Search", font=('verdana', 10, 'bold'), cursor="hand2", relief=RIDGE, command=get_meaning, bg="red")
 search.pack(pady = 5)
 
-quit = Button(dict_frame, text="Quit", font=('verdana', 10, 'bold'), cursor="hand2", relief=RIDGE, command=quit)
-quit.pack(pady = 5)
+lbl_instructt = tk.Label(dict_frame, text='Please enter the word you wish to search the definition of.')
+lbl_instructt.pack(pady = 5)
 
 meaning = Label(dict_frame, text="Meaning", bg="white", font=('verdana', 15, 'bold'))
 meaning.pack(pady = 5)
 
 output = Text(dict_frame, height=8, width=40, borderwidth=2, relief=RIDGE)
-output.place(x=230, y=160)
+output.pack(pady = 5)
+
+btn_change_to_quiz = tk.Button(dict_frame,
+                               font=font_small,
+                               text='Back to main menu',
+                               command=change_to_quiz,
+                               bg="green")
+btn_change_to_quiz.pack(pady=20)
 
 root.mainloop()
